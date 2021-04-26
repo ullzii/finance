@@ -27,6 +27,30 @@ var uiController = (function () {
 
 // Санхүүтэй ажиллах контроллер -----------------------------------------------------------------------------------------------------------
 var financeController = (function () {
+    var Income = function (id, description, value) { // Байгуулагч функц  --- /Ерөнхий ОБ-н орлого зарлагыг үүсгээд тэдгээрийг хадгалах массивыг үүсгэв/
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    };
+
+    var Expense = function (id, description, value) {
+        this.id = id;
+        this.description = description;
+        this.value = value;
+    };
+
+
+    var data = {     // var incomes = [];  var expences = []; var totalIncomes = 0; var totalExpences = 0; гэж байна гэсэн үг
+        allItems: {
+            inc: [],
+            exp: []
+        },
+
+        totals: {
+            inc: 0,
+            exp: 0
+        }
+    };
 
 })();
 
@@ -41,7 +65,7 @@ var appController = (function (uiController, financeController) {
         // 5. Эцсийн үлдэгдэл, тооцоог дэлгэцэнд гаргана. 
     }
 
-    var setUpEventListeners = function () { // // Private function
+    var setUpEventListeners = function () { // Private function
         var DOM = uiController.getDOMstrings();
 
         document.querySelector(DOM.addBtn).addEventListener("click", function () {
