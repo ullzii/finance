@@ -32,10 +32,7 @@ var financeController = (function () {
 
 // Программын холбогч контроллер --------------------------------------------------------------------------------------------------------------------
 var appController = (function (uiController, financeController) {
-
-    var DOM = uiController.getDOMstrings();
-
-    var ctrlAddItem = function () {
+    var ctrlAddItem = function () { // Private function
         // 1. Оруулах өгөгдлийг дэлгэцээс олж авна.
         console.log(uiController.getInput())
         // 2. Олж авсан өгөгдлүүдээ санхүүгийн контроллерт дамжуулж тэнд хадгална.
@@ -44,15 +41,27 @@ var appController = (function (uiController, financeController) {
         // 5. Эцсийн үлдэгдэл, тооцоог дэлгэцэнд гаргана. 
     }
 
-    document.querySelector(DOM.addBtn).addEventListener("click", function () {
-        ctrlAddItem();
-    });
+    var setUpEventListeners = function () { // // Private function
+        var DOM = uiController.getDOMstrings();
 
-    document.addEventListener("keypress", function (event) {
-        if (event.keyCode === 13 || event.which === 13) {
+        document.querySelector(DOM.addBtn).addEventListener("click", function () {
             ctrlAddItem();
-        }
-    });
+        });
 
+        document.addEventListener("keypress", function (event) {
+            if (event.keyCode === 13 || event.which === 13) {
+                ctrlAddItem();
+            }
+        });
+    };
+
+    return { // Энэ бол PUBLIC SERVICE юм 
+        init: function () {
+            console.log("app started");
+            setUpEventListeners();
+        }
+    }
 
 })(uiController, financeController);
+
+appController.init();
