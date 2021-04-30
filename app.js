@@ -13,7 +13,7 @@ var uiController = (function () {
         getInput: function () {
             return {
                 // type: document.querySelector(".add__type").value, 
-                type: document.querySelector(DOMStrings.inputType).value,
+                type: document.querySelector(DOMStrings.inputType).value, // exp, inc
                 description: document.querySelector(DOMStrings.inputDescription).value,
                 value: document.querySelector(DOMStrings.inputValue).value
             };
@@ -27,21 +27,22 @@ var uiController = (function () {
 
 // Санхүүтэй ажиллах контроллер -----------------------------------------------------------------------------------------------------------
 var financeController = (function () {
+    // private data
     var Income = function (id, description, value) { // Байгуулагч функц  --- /Ерөнхий ОБ-н орлого зарлагыг үүсгээд тэдгээрийг хадгалах массивыг үүсгэв/
         this.id = id;
         this.description = description;
         this.value = value;
     };
-
+    // private data
     var Expense = function (id, description, value) {
         this.id = id;
         this.description = description;
         this.value = value;
     };
 
-
+    // private data
     var data = {     // var incomes = [];  var expences = []; var totalIncomes = 0; var totalExpences = 0; гэж байна гэсэн үг
-        allItems: {
+        items: {
             inc: [],
             exp: []
         },
@@ -52,14 +53,39 @@ var financeController = (function () {
         }
     };
 
+    return { // Энэ бол PUBLIC SERVICE юм
+        addItem: function (type, desc, val) {
+            var item, id;
+
+            if (data.items[type].length === 0) id = 1;
+            else {
+                id = data.items[type][data.items[type].length - 1].id + 1
+            }
+
+            if (type === "inc") {
+                item = new Income(id, desc, val);
+            } else {
+                item = new Expense(id, desc, val);
+            }
+
+            data.items[type].push(item);
+        },
+
+        seeData: function () {
+            return data;
+        }
+    };
+
 })();
 
 // Программын холбогч контроллер --------------------------------------------------------------------------------------------------------------------
 var appController = (function (uiController, financeController) {
     var ctrlAddItem = function () { // Private function
         // 1. Оруулах өгөгдлийг дэлгэцээс олж авна.
-        console.log(uiController.getInput())
-        // 2. Олж авсан өгөгдлүүдээ санхүүгийн контроллерт дамжуулж тэнд хадгална.
+        var input = uiController.getInput();
+
+        // 2. Олж авсан өгөгдлүsүдээ санхүүгийн контроллерт дамжуулж тэнд хадгална.
+        financeController.addItem(input.type, input.description, input.value);
         // 3. Олж авсан өгөгдлүүдээ вэб дээрээ тохирох хэсэгт нь гаргана. 
         // 4. Төсвийг тооцоолно.
         // 5. Эцсийн үлдэгдэл, тооцоог дэлгэцэнд гаргана. 
