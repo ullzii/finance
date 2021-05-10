@@ -59,6 +59,11 @@ var uiController = (function () {
 
         },
 
+        deleteListItem: function (id) { // id -р нь inc-1, exp-3 г.м орж ирнэ
+            var el = document.getElementById(id) // тухайн id-р ДОМ-с selectleed авчина.  
+            el.parentNode.removeChild(el); // el -н parent-г олоод буцаагаад el-ээ устгана гэсэн үг. 
+        },
+
         addListItem: function (item, type) {
             // Орлого зарлагын эле-г агуулсан HTML-г бэлтгэнэ.
             var html, list;
@@ -229,7 +234,7 @@ var appController = (function (uiController, financeController) {
         });
 
         document.querySelector(DOM.divContainer).addEventListener("click", function (event) {
-            var id = event.target.parentNode.parentNode.parentNode.parentNode.id;  // class="item clearfix" id="income-1" эндээс яг inc-1 гэж хэсгийг авч байна гэсэн үг. 
+            var id = event.target.parentNode.parentNode.parentNode.parentNode.id;  // class="item clearfix" id="inc-1" эндээс яг inc-1 гэж хэсгийг авч байна гэсэн үг. 
             if (id) { // Гэхдээ зарим эле-үүд бол id гүй тухайн container-н хаана нь ч бид дарж болно. Өөрөөр хэлбэл бөөрөнхий X -с бусад газар гэсэн үг. Тэр тохиолдол бидэнд хоосон ирээд байгаа. Тиймээс id тай тохиолдолд л гэж нөхцөл шалгана.
                 var arr = id.split("-"); // inc-2 -->  ["inc", "2"] 
                 var type = arr[0];
@@ -239,7 +244,9 @@ var appController = (function (uiController, financeController) {
 
                 // 1. Санхүүгийн модулиас type, id ашиглаад устгана. 
                 financeController.deleteItem(type, itemId);
+
                 // 2. Дэлгэцнээс энэ эле-г устгана. 
+                uiController.deleteListItem(id); // id - г дамжуулах буюу inc-1, exp-5 гэх мэт 
 
                 // 3. Үлдэгдэл тооцоог шинэчилж харуулна. 
             }
