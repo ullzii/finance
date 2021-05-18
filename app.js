@@ -98,6 +98,18 @@ var financeController = (function () {
         this.id = id;
         this.description = description;
         this.value = value;
+        this.percentage = -1; // энэ бол тус бүрийн хувийг хадгалах -1 бол одоо хувийг бодоогүй байгаа гэсэн үг. 
+    };
+
+    Expense.prototype.calcPercentage = function (totalIncome) { // Санхүүгийн модуль нийт totalIncome буюу data.totals.inc нийт бүх орлогийг дамжуулж өгнө гэсэн үг. 
+        if (totalIncome > 0)
+            this.percentage = Math.round((this.value / totalIncome) * 100); // this.value бол орж ирсэн зардал гэсэн үг жишээ нь гутал 15000 ч гэдэг юм уу. 
+        else this.percentage = 0
+    };
+
+    // ОБ болгоноос өөрийнхөө эзлэх хувийг санхүүгийн модуль асуух юм бол хэлж өгнө. 
+    Expense.prototype.getPercentage = function () {
+        return this.percentage;
     };
 
     // private data
@@ -139,8 +151,23 @@ var financeController = (function () {
             data.tusuv = data.totals.inc - data.totals.exp;
 
             // Орлого зарлагын хувийг тооцоолно.
-            data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+            if (data.totals.inc > 0) {
+                data.huvi = Math.round((data.totals.exp / data.totals.inc) * 100);
+            } else
+                data.huvi = 0;
+        },
 
+        calculatePercentages: function () {
+            data.items.exp.forEach(function (el) { // el буюу тус аргументаар нь тухайн exp дотор байгаа яг давталтан дээр явж байгаа тэр элем-г өгдөг гэсэн үг.
+                el.calcPercentage(data.totals.inc);
+            }) // data.exp дотор зөндөө олон зардалууд байж байгаа Об болгон өөрийн хувийг тооцолно. 
+        },
+
+        getPercentages: function () { // exp дотор давталт хийгээд бүх зарлагын ОБ-уудаас хувиа надаа өг гэнэ. Авсан хувинуудаа нэг массивт хийгээд тэр массиваа нэхэж буй газарт нь дамжуулна гэсэн үг. 
+            var allPercentages = data.items.exp.map(function (el) { // тухайн массивыг гадна талд нь хүлээж авна байна. 
+                return el.getPercentage();
+            });
+            return allPercentages;
         },
 
         tusviigAvah: function () {
@@ -205,20 +232,31 @@ var appController = (function (uiController, financeController) {
             uiController.addListItem(item, input.type);
             uiController.clearFields();
 
-            // 4. Төсвийг тооцоолно.
-            financeController.tusuvTootsooloh();
-
-            // 5. Эцсийн үлдэгдэл.
-            var tusuv = financeController.tusviigAvah();
-
-            // 6. Тооцоог дэлгэцэнд гаргана.
-            uiController.tusviigUzuuleh(tusuv);
-            console.log(tusuv)
+            // Төсвийг шинээр тооцоолоод дэлгэцэнд үзүүлнэ.  
+            updateTusuv();
         }
+    };
 
+    var updateTusuv = function () {
+        // 4. Төсвийг тооцоолно.
+        financeController.tusuvTootsooloh();
 
+        // 5. Эцсийн үлдэгдэл.
+        var tusuv = financeController.tusviigAvah();
 
-    }
+        // 6. Тооцоог дэлгэцэнд гаргана.
+        uiController.tusviigUzuuleh(tusuv);
+        console.log(tusuv);
+
+        // 7. Элементүүдийн хувийг тооцоолно.
+        financeController.calculatePercentages();
+
+        // 8. Элементүүдийн тооцоолсон хувийг хүлээж авна. 
+        var allPercentages = financeController.getPercentages();
+
+        // 9. Эдгээр хувийг дэлгэцэнд гаргана.
+        console.log(allPercentages);
+    };
 
     var setUpEventListeners = function () { // Private function
         var DOM = uiController.getDOMstrings();
@@ -249,6 +287,8 @@ var appController = (function (uiController, financeController) {
                 uiController.deleteListItem(id); // id - г дамжуулах буюу inc-1, exp-5 гэх мэт 
 
                 // 3. Үлдэгдэл тооцоог шинэчилж харуулна. 
+                // Төсвийг шинээр тооцоолоод дэлгэцэнд үзүүлнэ.  
+                updateTusuv();
             }
         });
     };
