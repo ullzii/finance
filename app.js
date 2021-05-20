@@ -12,7 +12,14 @@ var uiController = (function () {
         incomeLabel: ".budget__income--value",
         expenseLabel: ".budget__expenses--value",
         percentageLabel: ".budget__expenses--percentage",
-        divContainer: ".container"
+        divContainer: ".container",
+        expensePercentageLabel: ".item__percentage"
+    };
+
+    var NodelistForeach = function (list, callback) { // list е р elements орж ирнэ тэгээд шууд callback function орж ирнэ. 
+        for (var i = 0; i < list.length; i++) {
+            callback(list[i], i); // эле болгон дээр нь callback - г дуудчихна. 
+        }
     };
 
     return { // Энэ бол PUBLIC SERVICE юм
@@ -23,6 +30,18 @@ var uiController = (function () {
                 description: document.querySelector(DOMStrings.inputDescription).value,
                 value: parseInt(document.querySelector(DOMStrings.inputValue).value)
             };
+        },
+
+        displayPercentages: function (allPercentages) {
+            // Зарлагын nodeList-г олох
+            var elements = document.querySelectorAll(DOMStrings.expensePercentageLabel); // зарлагаар орж ирж буй node эле-г энд хадгална. 
+
+            // elements.foreach ---- уул нь массивт байсан бол шууд foreach гээд ашиглаж болно гэхдээ nodeList дээр foreach байдаггүй.
+            // Элемент болгоны хувьд зарлагын хувийг массиваас авч шивж оруулах 
+            NodelistForeach(elements, function (el, index) { // el нь elements нь хамгийн эхний элемен ба давталт явах тоолонд 2 3 4 дэхь элементүүд орж ирээд явчина. 
+                el.textContent = allPercentages[index]; // DOM -н элементийн утгийг өөрчилнө. Яагаад гэвэл ----> allPercentages === elements яг тэнцүү index тэй учираас
+            });
+
         },
 
         getDOMstrings: function () {
@@ -255,7 +274,8 @@ var appController = (function (uiController, financeController) {
         var allPercentages = financeController.getPercentages();
 
         // 9. Эдгээр хувийг дэлгэцэнд гаргана.
-        console.log(allPercentages);
+        uiController.displayPercentages(allPercentages);
+        // console.log(allPercentages);
     };
 
     var setUpEventListeners = function () { // Private function
