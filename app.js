@@ -40,15 +40,23 @@ var uiController = (function () {
 
         if (type === "inc") z = "+ " + z;
         else z = "- " + z;
-
         return z
     };
 
     return { // Энэ бол PUBLIC SERVICE юм
         displayDate: function () {
             var unuudur = new Date();
-
             document.querySelector(DOMStrings.dateLabel).textContent = unuudur.getFullYear() + " " + unuudur.getMonth() + " сарын "
+        },
+
+        changeTypeColor: function () {
+            var fields = document.querySelectorAll(DOMStrings.inputDescription + ", " + DOMStrings.inputType + ", " + DOMStrings.inputValue);
+
+            NodelistForeach(fields, function (el) { // el одоо байгаа элемент, classList гэдэг нь тухайн элементийн бүх class-н жагсаалт
+                el.classList.toggle("red-focus");
+            });
+
+            document.querySelector(DOMStrings.addBtn).classList.toggle("red");
         },
 
         getInput: function () {
@@ -91,13 +99,12 @@ var uiController = (function () {
             // }
         },
 
-
         tusviigUzuuleh: function (tusuv) {
             var type; // formatMoney public service-н аргументаар орно. 
             if (tusuv.tusuv > 0) type = "inc";
             else type = "exp";
 
-            document.querySelector(DOMStrings.tusuvLabel).textContent = formatMoney(tusuv.tusuv);
+            document.querySelector(DOMStrings.tusuvLabel).textContent = formatMoney(tusuv.tusuv, type);
             document.querySelector(DOMStrings.incomeLabel).textContent = formatMoney(tusuv.totalInc, "inc");
             document.querySelector(DOMStrings.expenseLabel).textContent = formatMoney(tusuv.totalExp, "exp");
 
@@ -106,8 +113,6 @@ var uiController = (function () {
             } else {
                 document.querySelector(DOMStrings.percentageLabel).textContent = tusuv.huvi;
             }
-
-
         },
 
         deleteListItem: function (id) { // id -р нь inc-1, exp-3 г.м орж ирнэ
@@ -237,7 +242,6 @@ var financeController = (function () {
 
             var index = ids.indexOf(id);  //  Устгах гэж буй index -г олно.  id нь гаднаас дамжууулсан id гэсэн үг.  Жишээ нь id -д 7 гэж дамжуулсан 7 гэдэг id ids дотор хэддүгээр index- д байна гэдгийг олоод var index -д хийнэ. 
 
-
             if (index !== - 1) {
                 data.items[type].splice(index, 1);
             }
@@ -297,7 +301,7 @@ var appController = (function (uiController, financeController) {
 
         // 6. Тооцоог дэлгэцэнд гаргана.
         uiController.tusviigUzuuleh(tusuv);
-        console.log(tusuv);
+        // console.log(tusuv);
 
         // 7. Элементүүдийн хувийг тооцоолно.
         financeController.calculatePercentages();
@@ -321,6 +325,8 @@ var appController = (function (uiController, financeController) {
                 ctrlAddItem();
             }
         });
+
+        document.querySelector(DOM.inputType).addEventListener("change", uiController.changeTypeColor);
 
         document.querySelector(DOM.divContainer).addEventListener("click", function (event) {
             var id = event.target.parentNode.parentNode.parentNode.parentNode.id;  // class="item clearfix" id="inc-1" эндээс яг inc-1 гэж хэсгийг авч байна гэсэн үг. 
